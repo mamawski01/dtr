@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import User from './src/routes/controller/models/User.js';
 
 import userRoutes from './src/routes/userRoutes.js';
+import { registerSocketServer } from './src/beIo.js/beIo.js';
 
 dotenv.config();
 const PORT = process.env.PORT || process.env.API_PORT;
@@ -14,6 +15,8 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 const server = http.createServer(app);
+
+registerSocketServer(server);
 
 mongoose
   .connect(process.env.MONGO_URI)

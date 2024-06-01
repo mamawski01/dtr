@@ -1,4 +1,5 @@
 import axios from 'axios';
+import connectWithSocketServer from '../feSocket/feSocket.js';
 
 const apiClient = axios.create({
   baseURL: 'http://localhost:7000/api',
@@ -31,6 +32,7 @@ export async function register(data) {
 
 export async function getUsers() {
   try {
+    connectWithSocketServer();
     return await apiClient.get('/users');
   } catch (exception) {
     return { error: true, exception };
