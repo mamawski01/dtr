@@ -1,5 +1,7 @@
 import { Server } from 'socket.io';
 
+import { emitMessageReceived } from './emit/emitFetchUserData.js';
+
 let beIo;
 
 export function registerSocketServer(server) {
@@ -17,11 +19,8 @@ export function registerSocketServer(server) {
       console.log('BE:someone disconnected');
     });
 
-    beIo.emit('fistEvent', 'hello this is the first event');
-
     socket.on('sendMessage', (message) => {
-      console.log(message);
-      socket.broadcast.emit('messageReceived', message);
+      emitMessageReceived(socket, message);
     });
   });
 }

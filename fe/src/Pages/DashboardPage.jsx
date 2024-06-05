@@ -1,24 +1,32 @@
-import { useQuery } from '@tanstack/react-query';
-
-import { getUsers } from '../api/api.js';
+import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
-import { getPress, getPressReceived } from '../feSocket/feSocket.js';
+
+import { getPress } from '../feSocket/feSocket.js';
+import { getUsers } from '../api/api.js';
 
 export default function DashboardPage() {
-  const { isLoading } = useQuery({
-    queryKey: ['user'],
-    queryFn: getUsers,
-  });
-
   const [text, textSet] = useState('');
+  const [isLoading, isLoadingSet] = useState(false);
+  const [error, errorSet] = useState([]);
+  const [data, dataSet] = useState([]);
 
   useEffect(() => {
-    getPressReceived();
+    async function fetchData() {
+      try {
+        isLoadingSet(true);
+        const res = await getUsers();
+        dataSet(res.data.users);
+      } catch (error) {
+        console.log(error);
+        errorSet(error.message);
+      } finally {
+        isLoadingSet(false);
+      }
+    }
+    fetchData();
     //cleaning
     return () => {};
   }, []);
-
-  if (isLoading) return <p>Loading...</p>;
 
   function handleChange(e) {
     textSet(e.target.value);
@@ -28,10 +36,8 @@ export default function DashboardPage() {
   function sendMessage(e) {
     e.preventDefault();
     getPress(text);
-    textSet('');
     return;
   }
-
   return (
     <div>
       <p>Dashboard</p>
@@ -44,7 +50,20 @@ export default function DashboardPage() {
       <button className="btn" onClick={sendMessage}>
         press
       </button>
-      <span>{text}</span>
+      <span>
+        {data.map((data, i) => (
+          <Mapper key={i} data={data}></Mapper>
+        ))}
+      </span>
     </div>
   );
 }
+
+function Mapper({ firstName }) {
+  console.log(firstName);
+  return <div></div>;
+}
+
+Mapper.propTypes = {
+  firstName: PropTypes.any,
+};
